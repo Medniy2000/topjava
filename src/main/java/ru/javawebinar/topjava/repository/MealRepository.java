@@ -5,11 +5,11 @@ import ru.javawebinar.topjava.model.Meal;
 import java.util.Collection;
 
 public interface MealRepository {
-    Meal save(Meal meal);
+    Meal save(Meal meal, Integer userId);
 
     void delete(int id);
 
     Meal get(int id);
 
-    Collection<Meal> getAll();
+    Collection<Meal> getAll(Integer userId);
 }
