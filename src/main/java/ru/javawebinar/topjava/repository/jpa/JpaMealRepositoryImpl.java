@@ -8,8 +8,7 @@ import ru.javawebinar.topjava.repository.MealRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,9 +36,7 @@ public class JpaMealRepositoryImpl implements MealRepository {
     @Override
     @Transactional
     public boolean delete(int id, int userId) {
-        Query query = em.createQuery("DELETE FROM Meal m WHERE m.id=:d1 AND m.user.id=:d2");
-
-        return query.
+        return em.createNamedQuery(Meal.DELETE).
                 setParameter("d1", id).
                 setParameter("d2", userId).
                 executeUpdate() != 0;
@@ -48,31 +45,27 @@ public class JpaMealRepositoryImpl implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        TypedQuery<Meal> query   = em.createQuery("SELECT m FROM Meal m WHERE m.id=:d1 AND m.user.id=:d2", Meal.class);
-
-        return  query.setParameter("d1", id).
-                setParameter("d2", userId).getSingleResult();
+        return  em.createNamedQuery(Meal.GET_BY_ID,Meal.class).
+                setParameter("d1", id).
+                setParameter("d2", userId).
+                getSingleResult();
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        TypedQuery<Meal>  query = em.createQuery("SELECT m FROM Meal m WHERE m.user.id=:d1 ORDER BY date_time DESC", Meal.class);
 
-        query.setParameter("d1", userId);
+        return em.createNamedQuery(Meal.ALL_SORTED,Meal.class).
+                setParameter("d1", userId).
+                getResultList();
 
-        return  query.getResultList();
     }
 
     @Override
     public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
-
-        TypedQuery<Meal>  query = em.createQuery("SELECT m FROM Meal m WHERE m.user.id=:d3 " +
-                "AND date_time BETWEEN :d1 AND :d2 ORDER BY date_time DESC", Meal.class);
-
-        query.setParameter("d1",startDate);
-        query.setParameter("d2",endDate);
-        query.setParameter("d3", userId);
-
-        return query.getResultList();
+        return em.createNamedQuery(Meal.GET_BETWEEN,Meal.class).
+                setParameter("d1",startDate).
+                setParameter("d2",endDate).
+                setParameter("d3", userId).
+                getResultList();
     }
 }

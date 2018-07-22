@@ -6,9 +6,22 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+@NamedQueries({
+        @NamedQuery(name = Meal.GET_BY_ID, query = "SELECT m FROM Meal m WHERE m.id=:d1 AND m.user.id=:d2"),
+        @NamedQuery(name = Meal.ALL_SORTED, query = "SELECT m FROM Meal m WHERE m.user.id=:d1 ORDER BY date_time DESC"),
+        @NamedQuery(name = Meal.GET_BETWEEN, query = "SELECT m FROM Meal m WHERE m.user.id=:d3 " +
+                "AND date_time BETWEEN :d1 AND :d2 ORDER BY date_time DESC"),
+        @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m WHERE m.id=:d1 AND m.user.id=:d2")
+})
+
 @Entity
 @Table(name = "meals", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "date_time"}, name = "meals_unique_user_datetime_idx")})
-public class Meal extends AbstractBaseEntity {
+public class Meal extends AbstractBaseEntity{
+
+    public static final String GET_BY_ID  ="Meal.getById";
+    public static final String ALL_SORTED = "Meal.getAllSorted";
+    public static final String GET_BETWEEN = "Meal.getBetween";
+    public static final String DELETE = "Meal.delete";
 
     @Column(name ="date_time", nullable = false)
     private LocalDateTime dateTime;
@@ -20,7 +33,7 @@ public class Meal extends AbstractBaseEntity {
     @Digits(fraction = 0, integer = 4)
     private int calories;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private User user;
 
     public Meal() {
